@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyView — Weather App</title>
+
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Your CSS -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── ANIMATED SKY SCENE ── -->
+  <div id="scene"></div>
+  <div id="skyball"></div>
+  <div class="cloud" style="width:180px;height:50px;top:15%;animation-duration:60s;animation-delay:-20s;opacity:0.7"></div>
+  <div class="cloud" style="width:130px;height:38px;top:22%;animation-duration:80s;animation-delay:-50s;opacity:0.5"></div>
+  <div class="cloud" style="width:220px;height:60px;top:10%;animation-duration:95s;animation-delay:-10s;opacity:0.6"></div>
+
+  <div id="app">
+
+    <!-- ── HEADER ── -->
+    <header>
+      <div class="logo">Sky<span>View</span> 🌤</div>
+      <div class="time-display">
+        <strong id="clock">--:--</strong>
+        <span id="date-display">---</span>
+      </div>
+    </header>
+
+    <!-- ── SEARCH BAR ── -->
+    <div class="search-bar">
+      <input
+        type="text"
+        id="search-input"
+        placeholder="Search city, country, or India city…"
+        autocomplete="off"
+      />
+      <button onclick="doSearch()">Search</button>
+    </div>
+
+    <!-- ── QUICK CITY BUTTONS ── -->
+    <div class="quick-btns">
+      <button class="qbtn" onclick="searchCity('Mumbai')">Mumbai</button>
+      <button class="qbtn" onclick="searchCity('Delhi')">Delhi</button>
+      <button class="qbtn" onclick="searchCity('Bangalore')">Bengaluru</button>
+      <button class="qbtn" onclick="searchCity('Chennai')">Chennai</button>
+      <button class="qbtn" onclick="searchCity('Kolkata')">Kolkata</button>
+      <button class="qbtn" onclick="searchCity('Jaipur')">Jaipur</button>
+      <button class="qbtn" onclick="searchCity('Hyderabad')">Hyderabad</button>
+      <button class="qbtn" onclick="searchCity('Pune')">Pune</button>
+      <button class="qbtn" onclick="searchCity('London')">London</button>
+      <button class="qbtn" onclick="searchCity('New York')">New York</button>
+      <button class="qbtn" onclick="searchCity('Tokyo')">Tokyo</button>
+      <button class="qbtn" onclick="searchCity('Dubai')">Dubai</button>
+    </div>
+
+    <!-- ── STATUS MESSAGE ── -->
+    <div id="status-msg"></div>
+
+    <!-- ── MAIN GRID ── -->
+    <main>
+
+      <!-- Hero Weather Card -->
+      <div class="glass" id="main-weather">
+        <div class="glass-title">Current Weather</div>
+        <div class="city-name" id="city-name">—</div>
+        <div class="region-name" id="region-name">Search a city to begin</div>
+        <div class="weather-icon" id="weather-icon">🌡️</div>
+        <div class="temp-row">
+          <div class="temp-big" id="temp-val">--</div>
+          <div class="temp-unit">°C</div>
+        </div>
+        <div class="weather-desc" id="weather-desc">—</div>
+        <div class="feels-like" id="feels-like">Feels like —°C</div>
+        <div class="stat-row">
+          <div class="stat">
+            <div class="stat-label">💨 Wind</div>
+            <div class="stat-value" id="wind-val">—</div>
+            <div class="stat-sub">km/h</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">💧 Humidity</div>
+            <div class="stat-value" id="humid-val">—</div>
+            <div class="stat-sub">%</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">🌧 Rainfall</div>
+            <div class="stat-value" id="rain-val">—</div>
+            <div class="stat-sub">mm</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Map Card -->
+      <div class="glass" id="map-card">
+        <div class="glass-title">Location Map</div>
+        <div id="map-tabs">
+          <button class="tab active" onclick="switchMap('world', this)">🌍 World</button>
+          <button class="tab" onclick="switchMap('india', this)">🇮🇳 India</button>
+        </div>
+        <div id="map"></div>
+      </div>
+
+      <!-- Details Card -->
+      <div class="glass" id="details-card">
+        <div class="glass-title">More Details</div>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <div class="detail-icon">👁️</div>
+            <div>
+              <div class="detail-label">Visibility</div>
+              <div class="detail-val" id="vis-val">— km</div>
+            </div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-icon">🧭</div>
+            <div>
+              <div class="detail-label">Pressure</div>
+              <div class="detail-val" id="pres-val">— hPa</div>
+            </div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-icon">🌡️</div>
+            <div>
+              <div class="detail-label">Dew Point</div>
+              <div class="detail-val" id="dew-val">—°C</div>
+            </div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-icon">☁️</div>
+            <div>
+              <div class="detail-label">Cloud Cover</div>
+              <div class="detail-val" id="cloud-val">— %</div>
+            </div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-icon">🌬️</div>
+            <div>
+              <div class="detail-label">Wind Direction</div>
+              <div class="detail-val" id="winddir-val">—</div>
+            </div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-icon">☀️</div>
+            <div>
+              <div class="detail-label">UV Index</div>
+              <div class="detail-val" id="uv-val">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hourly Forecast Card -->
+      <div class="glass" id="hourly-card">
+        <div class="glass-title">Today's Hourly Forecast</div>
+        <div class="hourly-row" id="hourly-row">
+          <div class="no-data-msg">Search a city to see hourly forecast</div>
+        </div>
+      </div>
+
+    </main>
+  </div><!-- end #app -->
+
+  <!-- Leaflet Map JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Your JS -->
+  <script src="script.js"></script>
+
+</body>
+</html>
